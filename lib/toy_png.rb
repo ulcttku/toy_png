@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 require_relative "toy_png/version"
+require_relative "toy_png/png"
 
-module ToyPng
-  class Error < StandardError; end
-  # Your code goes here...
-end
+module ToyPng; end
+
+
+require_relative "toy_png/png"
