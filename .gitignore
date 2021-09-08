@@ -8,6 +8,7 @@
 /tmp/
 /vendor/
 Gemfile.lock
+test.rb
 
 # rspec failure tracking
 .rspec_status
