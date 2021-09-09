@@ -4,6 +4,3 @@ require_relative "toy_png/version"
 require_relative "toy_png/png"
 
 module ToyPng; end
-
-
-require_relative "toy_png/png"
