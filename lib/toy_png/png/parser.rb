@@ -3,7 +3,7 @@ require_relative "./file_structure"
 require_relative "./chunk"
 
 module ToyPng
-  module Png
+  class Png
     class Parser
       class << self
         def parse(file)
@@ -11,7 +11,7 @@ module ToyPng
 
           @@pos = 0
           unless(is_png(file))
-            raise StandardError.new("")
+            raise StandardError, "#{file} is not png file."
           end
 
           file_sign = read_file_sign()

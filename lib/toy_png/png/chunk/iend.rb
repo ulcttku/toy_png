@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 module ToyPng
-  module Png
+  class Png
     module Chunk
       class Iend < BaseChunk
-        
+
         def initialize()
           @chunk_length = "\x00\x00\x00\x00"
           @chunk_type = "IEND"
@@ -13,6 +13,15 @@ module ToyPng
         end
 
         class << self
+          def create() = self.new()
+
+          def read(chunk_byte_data)
+            unless(self.match?(chunk_byte_data))
+              raise StandardError, "arg is not IEND chunk data."
+            end
+            self.new()
+          end
+
           def match?(byte_string)
             # The encoding of the RHS is UTF-8, and the encoding of the LHS is ASCII-8BIT.
             # Besides, the encoding of the RHS cannot be converted to ASCII-8BIT,
