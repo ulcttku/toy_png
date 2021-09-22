@@ -5,7 +5,7 @@ require_relative "./png/writer"
 module ToyPng
   class Png
     def self.read(file_name)
-      file = File.open(file_name, "rb").read
+      file = File.open(file_name, "rb")
       ToyPng::Png::Parser.parse(file)
     end
 

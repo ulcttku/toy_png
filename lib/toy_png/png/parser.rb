@@ -7,11 +7,11 @@ module ToyPng
     class Parser
       class << self
         def parse(file)
-          @@file = file
+          @@file = file.read.b
 
           @@pos = 0
-          unless(is_png(file))
-            raise StandardError, "#{file} is not png file."
+          unless(is_png())
+            raise StandardError, "#{@@file} is not png file."
           end
 
           file_sign = read_file_sign()
@@ -32,8 +32,8 @@ module ToyPng
         end
 
         private
-        def is_png(file)
-          ToyPng::Png::FileStructure.match?(file) && ToyPng::Png::Chunk::Iend.match?(file)
+        def is_png()
+          ToyPng::Png::FileStructure.match?(@@file) && ToyPng::Png::Chunk::Iend.match?(@@file)
         end
 
         def read_file_sign
