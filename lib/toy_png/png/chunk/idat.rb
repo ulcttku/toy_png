@@ -6,20 +6,30 @@ module ToyPng
   class Png
     module Chunk
       class Idat < BaseChunk
-        def self.create(pixels)
-          pixels_data = pixels
+        attr_accessor :pixels
+
+        CHUNK_TYPE = "IDAT"
+
+        def initialize(pixels)
+          @pixels = pixels
+        end
+
+        def self.read(byte_string, offset = 0)
+          # TODO: impl
+        end
+
+        def bytes
+          pixels_data = @pixels
             .map{ [[0]].concat(_1) }
             .flatten()
             .pack("C*")
 
-          chunk_data =  self.to_s.split("::").last.upcase +
-            self.deflate(pixels_data)
+          chunk_data = self.class.deflate(pixels_data)
 
-          chunk_byte_data = [chunk_data.length - 4].pack("N") +
+          [chunk_data.length].pack("N") +
+            CHUNK_TYPE +
             chunk_data +
             calc_crc(chunk_data)
-
-          read(chunk_byte_data)
         end
 
         private

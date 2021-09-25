@@ -23,7 +23,7 @@ module ToyPng
       filter_method: 0,
       interlace_method: 0
     )
-      @ihdr = ToyPng::Png::Chunk::Ihdr.create(
+      @ihdr = ToyPng::Png::Chunk::Ihdr.new(
         width,
         height,
         bit_depth,
@@ -32,11 +32,11 @@ module ToyPng
         filter_method,
         interlace_method
       )
-      @iend = ToyPng::Png::Chunk::Iend.create()
+      @iend = ToyPng::Png::Chunk::Iend.new()
     end
 
     def set_pixels(pixels)
-      @idat = [ToyPng::Png::Chunk::Idat.create(pixels)]
+      @idat = [ToyPng::Png::Chunk::Idat.new(pixels)]
     end
 
     def save(file_name)

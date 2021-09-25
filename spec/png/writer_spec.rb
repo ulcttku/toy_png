@@ -12,10 +12,10 @@ RSpec.describe 'ToyPng::Png::Writer' do
     ToyPng::Png::Writer.write(png, "dummy_filename")
 
     file.rewind
-    expect(ToyPng::Png::FileStructure.match?(file.read)).to eq true
+    expect(ToyPng::Png::FileStructure.match?(file.read[0, 8])).to eq true
 
     file.rewind
-    expect(ToyPng::Png::Chunk::Iend.match?(file.read)).to eq true
+    expect(ToyPng::Png::Chunk::Iend.match?(file.read[-12, 12])).to eq true
   end
 
   it 'cannot create png file if IHDR does not exist.' do

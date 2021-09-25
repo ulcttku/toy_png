@@ -24,16 +24,13 @@ module ToyPng
           [
             file_sign,
             ihdr,
-            chunk1,
-            chunk2,
-            chunk3,
             iend,
           ]
         end
 
         private
         def is_png()
-          ToyPng::Png::FileStructure.match?(@@file) && ToyPng::Png::Chunk::Iend.match?(@@file)
+          ToyPng::Png::FileStructure.match?(@@file[0, 8]) && ToyPng::Png::Chunk::Iend.match?(@@file[-12, 12])
         end
 
         def read_file_sign
@@ -42,20 +39,19 @@ module ToyPng
         end
 
         def read_ihdr
-          chunk = ToyPng::Png::Chunk::Ihdr.new(@@file[@@pos..-1])
-          @@pos += chunk.full_length
+          chunk = ToyPng::Png::Chunk::Ihdr.read(@@file, @@pos)
+          @@pos += chunk.bytes.size
           chunk
         end
 
         def read_chunk
-          chunk = ToyPng::Png::Chunk::BaseChunk.new(@@file[@@pos..-1])
-          @@pos += chunk.full_length
-          chunk
+          @@pos += @@file[@@pos, @@pos+4].unpack1("N") + 12
+          nil
         end
 
         def read_iend
           chunk = ToyPng::Png::Chunk::Iend.new()
-          @@pos += chunk.full_length
+          @@pos += chunk.bytes.size
           chunk
         end
 

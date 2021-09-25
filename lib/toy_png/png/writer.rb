@@ -33,12 +33,12 @@ module ToyPng
           end
 
           File.open(png_file_name, "wb") do |f|
-            f.write ToyPng::Png::FileStructure.byte_string
-            f.write png.ihdr.byte_string
+            f.write ToyPng::Png::FileStructure.bytes
+            f.write png.ihdr.bytes
             png.idat.each do |data|
-              f.write data.byte_string
+              f.write data.bytes
             end
-            f.write png.iend.byte_string
+            f.write png.iend.bytes
           end
         end
       end

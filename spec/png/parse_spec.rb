@@ -2,12 +2,14 @@
 
 RSpec.describe 'ToyPng::Png::Parser' do
   it 'can parse' do
-    file = File.open("./spec/fixtures/white_10x10.png", "rb").read
+    file = File.open("./spec/fixtures/white_10x10.png", "rb")
     chunks = ToyPng::Png::Parser.parse(file)
-    expect(chunks[1].chunk_type).to eq "IHDR"
-    expect(chunks[2].chunk_type).to eq "sRGB"
-    expect(chunks[3].chunk_type).to eq "gAMA"
-    expect(chunks[4].chunk_type).to eq "pHYs"
-    expect(chunks[5].chunk_type).to eq "IEND"
+    expect(chunks[1].width).to eq 10
+    expect(chunks[1].height).to eq 10
+    expect(chunks[1].bit_depth).to eq 8
+    expect(chunks[1].color_type).to eq 2
+    expect(chunks[1].compression_method).to eq 0
+    expect(chunks[1].filter_method).to eq 0
+    expect(chunks[1].interlace_method).to eq 0
   end
 end

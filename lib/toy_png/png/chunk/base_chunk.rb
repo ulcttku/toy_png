@@ -5,49 +5,66 @@ module ToyPng
   class Png
     module Chunk
       class BaseChunk
-        attr_reader :chunk_length, :chunk_type, :chunk_data, :chunk_crc
+        CHUNK_TYPE = "" # Must set chunk_type
 
-        def initialize(chunk_byte_data)
-          @chunk_length = chunk_byte_data[0, 4]
-          @chunk_type = chunk_byte_data[4, 4]
-          @chunk_data = chunk_byte_data[8, chunk_data_length()]
-
-          read_crc = chunk_byte_data[8 + chunk_data_length(), 4]
-          calced_crc = calc_crc(@chunk_type + @chunk_data)
-
-          if(read_crc != calced_crc)
-            raise StandardError, "Not match CRC."
-          end
-          @chunk_crc = calced_crc
-        end
-
-        def self.create
+        # Initialize chunks by receiving numeric chunk data.
+        def initialize
           raise StandardError, "Must implement."
         end
 
-        def self.read(chunk_byte_data)
-          self.new(chunk_byte_data)
+        # Read a byte string and create a chunk.
+        def self.read(byte_string, offset = 0)
+          raise StandardError, "Must implement."
         end
 
-        def byte_string
-          @chunk_length + @chunk_type + @chunk_data + @chunk_crc
+        # Convert a number to a byte string.
+        def bytes
+          raise StandardError, "Must implement."
         end
 
-        def full_length
-          byte_string.length
-        end
+        protected def calc_crc(chunk_data) = self.class.calc_crc(chunk_data)
 
-        protected
+        class << self
 
-        def chunk_data_length
-          @chunk_length.unpack("N").first
-        end
+          # Receives byte strings and splits them into parts.
+          def split_parts(byte_string, offset = 0)
+            pos = offset
+            chunk_length = byte_string[pos, 4]
+            pos += 4
 
-        def calc_crc(chunk_data) = self.class.calc_crc(chunk_data)
+            chunk_data_length = chunk_length.unpack1("N")
 
-        def self.calc_crc(chunk_data)
-          crc = Zlib.crc32(chunk_data) & 0xFFFFFFFF
-          24.step(0, -8).map {(crc & (0xFF << _1)) >> _1}.pack("C*")
+            read_type = byte_string[pos, 4]
+            pos += 4
+
+            if(read_type != self::CHUNK_TYPE)
+              raise StandardError, "Not match chunk type."
+            end
+            chunk_type = read_type
+
+            chunk_data = byte_string[pos, chunk_data_length]
+            pos += chunk_data_length
+
+            read_crc = byte_string[pos, 4]
+            pos += 4
+
+            calced_crc = calc_crc(chunk_type + chunk_data)
+            if(read_crc != calced_crc)
+              raise StandardError, "Not match CRC."
+            end
+            chunk_crc = read_crc
+
+            {
+              length: chunk_length,
+              chunk_type: chunk_type,
+              chunk_data: chunk_data,
+              crc: chunk_crc,
+            }
+          end
+
+          def calc_crc(byte_string)
+            [Zlib.crc32(byte_string) & 0xFFFFFFFF].pack("N")
+          end
         end
       end
     end

@@ -5,7 +5,18 @@ module ToyPng
   class Png
     module Chunk
       class Ihdr < BaseChunk
-        def self.create(
+        attr_accessor(
+          :width,
+          :height,
+          :bit_depth,
+          :color_type,
+          :compression_method,
+          :filter_method,
+          :interlace_method,
+        )
+        CHUNK_TYPE = "IHDR"
+
+        def initialize(
             width,
             height,
             bit_depth,
@@ -14,31 +25,46 @@ module ToyPng
             filter_method,
             interlace_method
           )
-          chunk_data = self.to_s.split("::").last.upcase +
-            [
-              width,
-              height,
-              bit_depth,
-              color_type,
-              compression_method,
-              filter_method,
-              interlace_method,
-            ].pack("NNC*")
-
-          chunk_byte_data = [chunk_data.length - 4].pack("N") +
-            chunk_data +
-            calc_crc(chunk_data)
-
-          read(chunk_byte_data)
+            @width = width
+            @height = height
+            @bit_depth = bit_depth
+            @color_type = color_type
+            @compression_method = compression_method
+            @filter_method = filter_method
+            @interlace_method = interlace_method
         end
 
-        def width() = @chunk_data[0, 4].unpack("N").first
-        def height() = @chunk_data[4, 4].unpack("N").first
-        def bit_depth() = @chunk_data[8, 1].unpack("C").first
-        def color_type() = @chunk_data[9, 1].unpack("C").first
-        def compression_method() = @chunk_data[10, 1].unpack("C").first
-        def filter_method() = @chunk_data[11, 1].unpack("C").first
-        def interlace_method() = @chunk_data[12, 1].unpack("C").first
+        def self.read(byte_string, offset = 0)
+          case self.split_parts(byte_string, offset)
+          in {chunk_data: chunk_data}
+            self.new(
+              chunk_data[ 0, 4].unpack1("N"),
+              chunk_data[ 4, 4].unpack1("N"),
+              chunk_data[ 8, 1].unpack1("C"),
+              chunk_data[ 9, 1].unpack1("C"),
+              chunk_data[10, 1].unpack1("C"),
+              chunk_data[11, 1].unpack1("C"),
+              chunk_data[12, 1].unpack1("C"),
+            )
+          end
+        end
+
+        def bytes
+          chunk_data = [
+            @width,
+            @height,
+            @bit_depth,
+            @color_type,
+            @compression_method,
+            @filter_method,
+            @interlace_method,
+          ].pack("NNCCCCC")
+
+          [chunk_data.length].pack("N") +
+            CHUNK_TYPE +
+            chunk_data +
+            calc_crc(chunk_data)
+        end
       end
     end
   end
